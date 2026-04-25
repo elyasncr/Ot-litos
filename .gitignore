@@ -1,0 +1,26 @@
+# Dados pesados (binários grandes — não versionar)
+Amostras/
+Gabarito/
+models/
+outputs/
+_pdf_images/
+_smoke_test/
+.cache/
+
+# Ambiente virtual e cache do Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDEs e SO
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
