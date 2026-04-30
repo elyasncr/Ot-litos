@@ -11,6 +11,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
+# PyTorch com CUDA 12.8 (suporte Blackwell — RTX 50-series)
+# Wheels oficiais já trazem o runtime CUDA embutido; só precisa do driver NVIDIA no host.
+RUN pip install --no-cache-dir \
+    --index-url https://download.pytorch.org/whl/cu128 \
+    torch==2.7.0 torchvision==0.22.0
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

@@ -33,7 +33,7 @@ from pipeline.extractor import FeatureExtractor
 from pipeline.identifier import load_database, identify_from_pil
 from pipeline.preprocessor import preprocess_pil
 
-IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp"}
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp", ".heic", ".heif"}
 
 
 # ════════════════════════════════════════════════════════════════════

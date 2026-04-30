@@ -20,15 +20,41 @@ from PIL import Image
 # ── Configurações ──────────────────────────────────────────────────
 TARGET_SIZE = (224, 224)   # tamanho de entrada da CNN
 BLUR_KERNEL = (3, 3)
+MAX_SIDE    = 1024         # downscale antes das ops pesadas (CLAHE/GrabCut)
 
 
 # ══════════════════════════════════════════════════════════════════
 # Funções públicas
 # ══════════════════════════════════════════════════════════════════
 
+def _downscale_bgr(img_bgr: np.ndarray, max_side: int = MAX_SIDE) -> np.ndarray:
+    h, w = img_bgr.shape[:2]
+    m = max(h, w)
+    if m <= max_side:
+        return img_bgr
+    scale = max_side / m
+    new_size = (int(w * scale), int(h * scale))
+    return cv2.resize(img_bgr, new_size, interpolation=cv2.INTER_AREA)
+
+
+def _downscale_pil(pil: Image.Image, max_side: int = MAX_SIDE) -> Image.Image:
+    w, h = pil.size
+    m = max(w, h)
+    if m <= max_side:
+        return pil
+    scale = max_side / m
+    return pil.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+
+
 def load_image(image_path: str) -> np.ndarray:
-    """Lê a imagem em BGR (formato padrão do OpenCV)."""
+    """Lê a imagem em BGR (formato padrão do OpenCV).
+    Usa PIL+pillow_heif como fallback (suporte a HEIC/HEIF)."""
     img = cv2.imread(str(image_path))
+    if img is None:
+        # Fallback: cv2.imread não cobre HEIC e alguns outros formatos.
+        # pillow_heif já está registrado em pipeline/__init__.py.
+        pil = Image.open(image_path).convert("RGB")
+        img = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
     if img is None:
         raise FileNotFoundError(f"Imagem não encontrada: {image_path}")
     return img
@@ -104,6 +130,7 @@ def preprocess(
     Retorna objeto PIL pronto para a CNN.
     """
     img = load_image(image_path)
+    img = _downscale_bgr(img)
     img = denoise(img)
 
     if contrast:
@@ -126,7 +153,8 @@ def preprocess_pil(
     Mesma lógica, mas aceita objeto PIL como entrada.
     Útil para a UI (Gradio entrega PIL diretamente).
     """
-    img_bgr = cv2.cvtColor(np.array(pil_image.convert("RGB")), cv2.COLOR_RGB2BGR)
+    pil_image = _downscale_pil(pil_image.convert("RGB"))
+    img_bgr = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
     img_bgr = denoise(img_bgr)
 
     if contrast:

@@ -1,11 +1,18 @@
 # Dados pesados (binários grandes — não versionar)
 Amostras/
 Gabarito/
+data/
 models/
 outputs/
 _pdf_images/
 _smoke_test/
 .cache/
+
+# Configuração local de ferramentas
+.claude/
+
+# Arquivos de outros projetos / scratch
+VS_conditional_gan*.py
 
 # Ambiente virtual e cache do Python
 .venv/
